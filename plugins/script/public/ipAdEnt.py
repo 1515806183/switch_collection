@@ -55,9 +55,8 @@ def get_ipAdEnt(data):
         addr_list = re.findall(r'IpAddress:.(.*)', i)
         if addr_list:
             addr = addr_list[0]
-        else:
-            addr = ""
-        ipAdEntDict.update({"ip": addr})
+            ipAdEntDict.update({"ip": addr})
+            break
 
     ipAdEntIfIndexTxt = re.findall(r'IP-MIB::ipAdEntIfIndex.(.*)', data)
     for i in ipAdEntIfIndexTxt:

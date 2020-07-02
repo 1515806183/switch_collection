@@ -102,6 +102,10 @@ class CleanPublicData(object):
                 # 合并完网卡描叙后 删除 type
                 del self.data['type']
 
+            # 初始化remote_list
+            for k in self.port_info_list:
+                self.port_info_list[k]['remote_list'] = []
+
             # 加入到data数据中
             self.data['port_info_list'] = self.port_info_list
         except Exception as e:
@@ -169,9 +173,6 @@ class CleanPublicData(object):
                         local_port = localPortDic[k]
                         # 3. 循环端口信息
                         for port_k, port_v in self.data.get('port_info_list').items():
-                            if not port_v.has_key('remote_list'):
-                                # 3.1初始化key  remote_list
-                                self.data.get('port_info_list')[str(port_k)]['remote_list'] = []
 
                             # 3.2 判断对端的k 和端口详情的k是否相等
                             if port_v['ifname'] == str(local_port):

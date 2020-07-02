@@ -10,7 +10,7 @@ def get_ifName(data):
         datalist = []
         for i in data.split('\n'):
             if i:
-                res = re.search(r'IF-MIB::ifName.(\d+)\s+=\s+\w+:\s+(\w+)', i).groups()
+                res = re.search(r'IF-MIB::ifName.(\d+)\s+=\s+\w+:\s+(.*)', i).groups()
                 datalist.append(res)
         result['ifName'] = datalist
     except Exception as e:

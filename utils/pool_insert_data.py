@@ -44,40 +44,40 @@ class insertData(object):
             else:
                 data_info = data_info
 
-            # 1.  根据ARP表去更新ipaddress模型数据
-            params = {
-                "name": "",
-                "mac": "",
-                "status": u"已分配"
-            }
-
-            dict_arp = data_info.get('ipNetToMediaPhysAddress')['dict_arp']
-
-            search_obj = EasyopsPubic()
-            for mac, ip in dict_arp.items():
-                params['name'] = ip
-                params['mac'] = mac
-
-                search = {
-                    "query": {
-                        "name": {"$eq": ip}
-                    },
-                    "fields": {
-                        "name": True,
-                        "mac": True
-                    }
-                }
-
-                res_list = search_obj.instance_search(object_id='IPADDRESS', params=search)
-                if not res_list:
-                    continue
-
-                for res in res_list:
-                    instance_id = res.get('instanceId')
-                    old_mac = res.get('mac')
-                    if mac != old_mac:
-                        restful_api = '/object/%s/instance/%s' % ('IPADDRESS', instance_id)
-                        http_post('put', restful_api, params)
+            # # 1.  根据ARP表去更新ipaddress模型数据
+            # params = {
+            #     "name": "",
+            #     "mac": "",
+            #     "status": u"已分配"
+            # }
+            #
+            # dict_arp = data_info.get('ipNetToMediaPhysAddress')['dict_arp']
+            #
+            # search_obj = EasyopsPubic()
+            # for mac, ip in dict_arp.items():
+            #     params['name'] = ip
+            #     params['mac'] = mac
+            #
+            #     search = {
+            #         "query": {
+            #             "name": {"$eq": ip}
+            #         },
+            #         "fields": {
+            #             "name": True,
+            #             "mac": True
+            #         }
+            #     }
+            #
+            #     res_list = search_obj.instance_search(object_id='IPADDRESS', params=search)
+            #     if not res_list:
+            #         continue
+            #
+            #     for res in res_list:
+            #         instance_id = res.get('instanceId')
+            #         old_mac = res.get('mac')
+            #         if mac != old_mac:
+            #             restful_api = '/object/%s/instance/%s' % ('IPADDRESS', instance_id)
+            #             http_post('put', restful_api, params)
 
             # 2. 汇报数据
             self._inser_data_to_cmdb(data_info)

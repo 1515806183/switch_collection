@@ -3,9 +3,9 @@
 
 # cmdb平台账号信息
 # 广汽配置
-easyops_cmdb_host = '192.166.14.162'
-easyops_org = '3120'
-easy_user = 'sysadmin'
+easyops_cmdb_host = '16.16.1.72'
+easyops_org = '9070'
+easy_user = 'easyops'
 
 # 公司配置
 # easyops_cmdb_host = '192.168.10.144'
@@ -51,7 +51,6 @@ ConfigParams = {
         ip: True
     }
 }
-
 
 # 模型配置,请先到cmdb中配置好
 setting_model = {
