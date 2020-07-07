@@ -122,17 +122,14 @@ class insertData(object):
                     info_to_port_url = '/object/{0}/relation/{1}/append'.format(setting_model.get('model_id'),setting_model.get('to_port_id'))
                     info_to_port_res = http_post('info_port', info_to_port_url, data)
                     if info_to_port_res:
-                        print '%s 实例ID：%s 基本信息, 端口信息, 关联端口信息入库成功' % (str(data_info.get('ip')), str(data_info.get('instanceId')))
+                        print '%s 实例ID：%s 基本信息, 端口信息, 关联端口信息入库成功' % (str(data_info.get('ip_info')['ip']), str(data_info.get('instanceId')))
                     else:
-                        print '%s 实例ID：%s 基本信息, 端口信息, 关联端口信息入库成功' % (str(data_info.get('ip')), str(data_info.get('instanceId')))
-
+                        print '%s 实例ID：%s 基本信息, 端口信息, 关联端口信息入库成功' % (str(data_info.get('ip_info')['ip']), str(data_info.get('instanceId')))
                 else:
-                    print '%s 实例ID：%s 端口信息入库失败' % (str(data_info.get('ip')), str(data_info.get('instanceId')))
+                    print '%s 实例ID：%s 基本信息入库失败' % (str(data_info.get('ip_info')['ip']), str(data_info.get('instanceId')))
 
             else:
                 if data_info.get('ip', ''):
-                    print '%s 实例ID：%s 基本信息入库失败' % (str(data_info.get('ip')), str(data_info.get('instanceId')))
-                else:
                     print '%s 实例ID：%s 基本信息入库失败' % (str(data_info.get('ip_info')['ip']), str(data_info.get('instanceId')))
 
         except Exception as e:

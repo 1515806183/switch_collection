@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
 import re, threading
+if_name = 'if_name'
+phys_addr = 'phys_addr'
+oper_status = 'oper_status'
+admin_status = 'admin_status'
+speed = 'speed'
+mtu = 'mtu'
+type = 'type'
 
-t = threading.currentThread()
+# t = threading.currentThread()
 
 
 # 整合公共oid的数据
@@ -30,7 +37,7 @@ class CleanPublicData(object):
                         1]})  # 网络接口标识符 [(u '1', u 'Vlan1'), (u '255', u 'Vlan255')]
 
                     # 网卡名
-                    self.port_info_list[descr[0]].update({"ifname": descr[1]})
+                    self.port_info_list[descr[0]].update({if_name: descr[1]})
 
                 # 合并完网卡描叙后 删除ifName， ifDescr
                 del self.data['ifDescr']
@@ -42,7 +49,7 @@ class CleanPublicData(object):
                     # 判断k是否存在，不存在则初始化
                     if not self.port_info_list.has_key(descr[0]):
                         self.port_info_list[descr[0]] = {}
-                    self.port_info_list[descr[0]].update({"macaddr": descr[1].upper()})
+                    self.port_info_list[descr[0]].update({phys_addr: descr[1].upper()})
 
                 # 合并完网卡描叙后 删除mac
                 del self.data['macaddr']
@@ -53,7 +60,7 @@ class CleanPublicData(object):
                     # 判断k是否存在，不存在则初始化
                     if not self.port_info_list.has_key(descr[0]):
                         self.port_info_list[descr[0]] = {}
-                    self.port_info_list[descr[0]].update({"speed": descr[1]})
+                    self.port_info_list[descr[0]].update({speed: descr[1]})
 
                 # 合并完网卡描叙后 删除speed
                 del self.data['speed']
@@ -64,7 +71,7 @@ class CleanPublicData(object):
                     # 判断k是否存在，不存在则初始化
                     if not self.port_info_list.has_key(descr[0]):
                         self.port_info_list[descr[0]] = {}
-                    self.port_info_list[descr[0]].update({"operstatus": descr[1]})
+                    self.port_info_list[descr[0]].update({oper_status: descr[1]})
 
                 # 合并完网卡描叙后 删除oper_status
                 del self.data['operstatus']
@@ -75,7 +82,7 @@ class CleanPublicData(object):
                     # 判断k是否存在，不存在则初始化
                     if not self.port_info_list.has_key(descr[0]):
                         self.port_info_list[descr[0]] = {}
-                    self.port_info_list[descr[0]].update({"adminstatus": descr[1]})
+                    self.port_info_list[descr[0]].update({admin_status: descr[1]})
 
                 # 合并完网卡描叙后 删除 admin_status
                 del self.data['adminstatus']
@@ -86,7 +93,7 @@ class CleanPublicData(object):
                     # 判断k是否存在，不存在则初始化
                     if not self.port_info_list.has_key(descr[0]):
                         self.port_info_list[descr[0]] = {}
-                    self.port_info_list[descr[0]].update({"mtu": descr[1]})
+                    self.port_info_list[descr[0]].update({mtu: descr[1]})
 
                 # 合并完网卡描叙后 删除mtu
                 del self.data['mtu']
@@ -97,7 +104,7 @@ class CleanPublicData(object):
                     # 判断k是否存在，不存在则初始化
                     if not self.port_info_list.has_key(descr[0]):
                         self.port_info_list[descr[0]] = {}
-                    self.port_info_list[descr[0]].update({"type": descr[1]})
+                    self.port_info_list[descr[0]].update({type: descr[1]})
 
                 # 合并完网卡描叙后 删除 type
                 del self.data['type']
@@ -175,7 +182,7 @@ class CleanPublicData(object):
                         for port_k, port_v in self.data.get('port_info_list').items():
 
                             # 3.2 判断对端的k 和端口详情的k是否相等
-                            if port_v['ifname'] == str(local_port):
+                            if port_v[if_name] == str(local_port):
                                 self.data.get('port_info_list')[str(port_k)]['remote_list'].append(v)
 
                 del self.data['lldpRemEntry']
@@ -227,7 +234,7 @@ class CleanPublicData(object):
 
                     # 判断端口名称是否为port-channel，类型是否为 propVirtual 然后清空 remote_list
                     for port, info in self.data.get('port_info_list').items():
-                        if info['type'] == 'propVirtual' and 'port-channel' in info['ifname'].lower():
+                        if info['type'] == 'propVirtual' and 'port-channel' in info[if_name].lower():
                             info['remote_list'] = []
                             # 赋值到self.data
                             self.data.get('port_info_list')[port] = info

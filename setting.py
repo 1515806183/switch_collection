@@ -3,9 +3,9 @@
 
 # cmdb平台账号信息
 # 广汽配置
-easyops_cmdb_host = '16.16.1.72'
-easyops_org = '9070'
-easy_user = 'easyops'
+easyops_cmdb_host = '192.166.14.162'
+easyops_org = '3120'
+easy_user = 'sysadmin'
 
 # 公司配置
 # easyops_cmdb_host = '192.168.10.144'
@@ -45,6 +45,9 @@ ip = 'ip'
 
 # 搜索实列列表条件
 ConfigParams = {
+    "query": {
+        "autoCollect": {"$eq": "yes"}
+    },
     "fields": {
         "name": True,
         community: True,
@@ -59,12 +62,11 @@ setting_model = {
     "to_port_id": "port_list",  # 交换机 --> 网络设备端口 别名ID
     "fields": {
         "upTime": "启动时间",
-        "ip": "管理IP",
         "brand": "品牌",
-        "netMask": "网关",
-        "sysDescr": "系统描叙",
-        "sysVersion": "版本号",
-        "sysName": "系统名称",
+        "netMask": "网关地址",
+        "sysDescr": "设备描述",
+        "sysVersion": "固件版本",
+        "sysName": "设备名",
         "sysModel": "型号",
         "sn": "序列号",
     },
@@ -73,13 +75,13 @@ setting_model = {
     "pk": "name",  # 网络端口模型主键
     "port_modol_id": "NETDPORT",  # 网络端口模型ID
     "port_info_list": {
-        "operstatus": "OperStatus",
-        "adminstatus": "AdminStatus",
+        "oper_status": "OperStatus",
+        "admin_status": "AdminStatus",
         "type": "类型",
         "name": "标识符",  # 要设置唯一，一般用默认创建的name属性
-        "macaddr": "物理地址",
+        "phys_addr": "物理地址",
         "speed": "协商速率",
-        "ifname": "端口名",
+        "if_name": "端口名",
         "mtu": "MTU",
         "vlan": "vlan",
         "remote_list": [{
@@ -101,7 +103,7 @@ switc = 'deal'  # 默认deal
 pool_nums = 20
 
 # 执行shell命令超时时间
-timeout = 3
+timeout = 20
 
 # 勿动，公共OID，
 plugins_oid = {
