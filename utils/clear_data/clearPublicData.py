@@ -13,11 +13,12 @@ type = 'type'
 
 # 整合公共oid的数据
 class CleanPublicData(object):
-    def __init__(self):
+    def __init__(self, data):
         """
         :param data: 每台机器才回来的数据，待合并
         """
         self.port_info_list = {}  # 每个端口的详情信息
+        self.data = data
 
     # 数据整理- 处理基本信息
     def _dealdescription(self):
@@ -120,44 +121,46 @@ class CleanPublicData(object):
 
     # 数据整理- 处理 MAC/PORT 表
     def _dealmacporttable(self):
-        dot1dBasePortIfIndex = self.data.get('dot1dBasePortIfIndex', '')  # 取出端口和索引的关系
-        dot1qTpFdbMac = self.data.get('dot1qTpFdbMac', '')
-        dot1qTpFdbPort = self.data.get('dot1qTpFdbPort', '')  # 取出端口和mac地址十进制之间的关系
-        # print dot1dBasePortIfIndex
-        # print dot1qTpFdbPort
-        # {u'49': u'10149', u'51': u'10151', u'50': u'10150', u'456': u'5001', u'52': u'10152'}
-        # {u'96.8.16.192.174.0': u'456', u'96.8.16.192.174.2': u'456', u'0.224.252.9.188.249': u'456'}
+        try:
+            dot1dBasePortIfIndex = self.data.get('dot1dBasePortIfIndex', '')  # 取出端口和索引的关系
+            dot1qTpFdbMac = self.data.get('dot1qTpFdbMac', '')
+            dot1qTpFdbPort = self.data.get('dot1qTpFdbPort', '')  # 取出端口和mac地址十进制之间的关系
+            # print dot1dBasePortIfIndex
+            # print dot1qTpFdbPort
+            # {u'49': u'10149', u'51': u'10151', u'50': u'10150', u'456': u'5001', u'52': u'10152'}
+            # {u'96.8.16.192.174.0': u'456', u'96.8.16.192.174.2': u'456', u'0.224.252.9.188.249': u'456'}
 
-        # print dot1qTpFdbMac
-        # [u'0.224.252.9.188.249 = Hex-STRING: 00 E0 FC 09 BC F9 ', u'96.8.16.192.174.0 = Hex-STRING: 60 08 10 C0 AE 00 ',
-        #  u'96.8.16.192.174.2 = Hex-STRING: 60 08 10 C0 AE 02 ']
+            # print dot1qTpFdbMac
+            # [u'0.224.252.9.188.249 = Hex-STRING: 00 E0 FC 09 BC F9 ', u'96.8.16.192.174.0 = Hex-STRING: 60 08 10 C0 AE 00 ',
+            #  u'96.8.16.192.174.2 = Hex-STRING: 60 08 10 C0 AE 02 ']
 
-        # 2. mac单独处理，且dot1qTpFdbMac是原始数据
-        mac_port_result = {}
+            # 2. 判断是否采集到数据
+            if dot1dBasePortIfIndex and dot1qTpFdbMac and dot1qTpFdbPort:
+                # 2.1. mac单独处理，且dot1qTpFdbMac是原始数据
+                mac_port_result = {}
+                # 取出端口和mac之间的关系
+                for mac_info in dot1qTpFdbMac:
+                    # mac十进制的值
+                    mac_index = str(mac_info.split(' ')[0])
 
-        # 3. 判断是否采集到数据
-        if dot1dBasePortIfIndex and dot1qTpFdbMac and dot1qTpFdbPort:
-            # 取出端口和mac之间的关系
-            for mac_info in dot1qTpFdbMac:
-                # mac十进制的值
-                mac_index = str(mac_info.split(' ')[0])
+                    # 对应的mac地址
+                    qTpFdbMac = str(re.findall(r'.Hex-STRING: (.*)', mac_info)[0].replace(' ', ':')[0:-1])
+                    # 根据mac十进制取出端口信息 456
+                    dbPortIfIndex = str(dot1qTpFdbPort[mac_index])
 
-                # 对应的mac地址
-                qTpFdbMac = str(re.findall(r'.Hex-STRING: (.*)', mac_info)[0].replace(' ', ':')[0:-1])
-                # 根据mac十进制取出端口信息 456
-                dbPortIfIndex = str(dot1qTpFdbPort[mac_index])
+                    # 根据端口信息取端口索引 456: 5001
+                    if dbPortIfIndex != '0' and dict(dot1dBasePortIfIndex).has_key(dbPortIfIndex):
+                        PortIfIndex = dot1dBasePortIfIndex[dbPortIfIndex]
+                        # 将对应索引的mac地址存入res_If中的remote_list
+                        mac_port_result[qTpFdbMac] = PortIfIndex
 
-                # 根据端口信息取端口索引 456: 5001
-                if dbPortIfIndex != '0' and dict(dot1dBasePortIfIndex).has_key(dbPortIfIndex):
-                    PortIfIndex = dot1dBasePortIfIndex[dbPortIfIndex]
-                    # 将对应索引的mac地址存入res_If中的remote_list
-                    mac_port_result[qTpFdbMac] = PortIfIndex
-
-        # TODO 下面要根据不同vlan采集信息
-        self.data['mac_port_table'].update(mac_port_result)
-        del self.data['dot1dBasePortIfIndex']
-        del self.data['dot1qTpFdbMac']
-        del self.data['dot1qTpFdbPort']
+                # TODO 下面要根据不同vlan采集信息
+                self.data.get('mac_port_table').update(mac_port_result)
+                del self.data['dot1dBasePortIfIndex']
+                del self.data['dot1qTpFdbMac']
+                del self.data['dot1qTpFdbPort']
+        except Exception as e:
+            print "数据整理- 处理 MAC/PORT 表: " + str(e)
 
     # 根据cdp或lldp协议获取端口对方的mac地址信息
     def _deallldpRemEntry(self):
@@ -170,23 +173,17 @@ class CleanPublicData(object):
             if lldpRemEntry and localPortDic:
                 # 循环遍历对端字典
                 for k, v in lldpRemEntry.items():
-                    # 1. 取对端标识符描叙
-                    peer_device = v.get('peer_device', '')
-                    # 2. 判断描述是否存在
-                    if peer_device:
-                        # 2.1 拼接端口标识符
-                        v['name'] = v['peer_device'] + ":" + v['peer_port']
-
-                        local_port = localPortDic[k]
-                        # 3. 循环端口信息
-                        for port_k, port_v in self.data.get('port_info_list').items():
-
+                    peer_device = v.get('peer_device', '')   # 对端设备名称
+                    if peer_device and peer_device != 'null':  # 判断是否为null
+                        v['name'] = v['peer_device'] + ":" + str(v['peer_port'])  # 拼接端口标识符 对端设备名 + 对端端口名
+                        local_port = localPortDic[k]  # 这里取到当前设备的设备名，然后到remote_list找到设备名，把对端信息加进去
+                        for port_k, port_v in self.data.get('port_info_list').items():  # 循环port_list_info端口信息
                             # 3.2 判断对端的k 和端口详情的k是否相等
                             if port_v[if_name] == str(local_port):
                                 self.data.get('port_info_list')[str(port_k)]['remote_list'].append(v)
 
-                del self.data['lldpRemEntry']
-                del self.data['localPortDic']
+            del self.data['lldpRemEntry']
+            del self.data['localPortDic']
 
         except Exception as e:
             print '根据cdp或lldp协议获取端口对方的mac地址信息, ' + str(e)
@@ -195,38 +192,49 @@ class CleanPublicData(object):
     def _dealprocess_netd_port_remote_list(self):
         try:
             mac_port_table = self.data.get('mac_port_table', '')
-            listPortChannel = self.data.get('portChannel')['listPortChannel']
-            dict_arp = self.data.get('ipNetToMediaPhysAddress')['dict_arp']
 
-            if mac_port_table and listPortChannel and dict_arp:
+            dict_arp = self.data.get('ipNetToMediaPhysAddress', '')
+            if dict_arp:
+                dict_arp = self.data['ipNetToMediaPhysAddress'].get('dict_arp', '')
+            else:
+                dict_arp = ''
+
+            listPortChannel = self.data.get('portChannel', '')
+            if listPortChannel:
+                listPortChannel = self.data['portChannel'].get('listPortChannel', '')
+            else:
+                listPortChannel = ''
+
+            if mac_port_table and dict_arp:
                 for mac, port in mac_port_table.items():
                     # 判断端口是否在端口信息里面
                     if not self.data.get('port_info_list').has_key(str(port)):
                         continue
 
                     # 判断端口是否为聚合端口
-                    if port in listPortChannel:
-                        continue
+                    if listPortChannel:
+                        if port in listPortChannel:
+                            continue
 
                     # 判断mac是否在mac-ip表，若存在，则取出对应ip
                     if mac in dict_arp.keys():
                         dict_arp_ip = dict_arp[mac]
                         data = {
-                            'name': "unknown",
-                            'peer_type': "unknown",
+                            'name': "",
+                            'peer_type': "",
                             'peer_mac': mac,
-                            'peer_port': "unknown",
-                            'peer_device': "unknown",
+                            'peer_port': "",
+                            'peer_device': "",
                             'peer_ip': dict_arp_ip
                         }
                     else:
                         data = {
-                            'name': 'unknown',
-                            'peer_type': "unknown",
+                            'name': '',
+                            'peer_type': "",
                             'peer_mac': mac,
-                            'peer_port': "unknown",
-                            'peer_device': 'unknown',
-                            'peer_ip': 'unknown'
+                            'peer_port': "",
+                            'peer_device': '',
+                            'peer_ip': ''
                         }
 
                     # 把数据添加到remote_list 里面
@@ -237,13 +245,12 @@ class CleanPublicData(object):
                         if info['type'] == 'propVirtual' and 'port-channel' in info[if_name].lower():
                             info['remote_list'] = []
                             # 赋值到self.data
-                            self.data.get('port_info_list')[port] = info
+                            self.data.get('port_info_list')[str(port)] = info
 
         except Exception as e:
             print '处理端口模型的对端列表数据, ' + str(e)
 
-    def run(self, data):
-        self.data = data
+    def run(self):
         self._dealdescription()  # 数据整理- 处理基本信息
         self._dealmacporttable()  # 数据整理- 处理 MAC/PORT 表
         self._deallldpRemEntry()  # 根据cdp或lldp协议获取端口对方的mac地址信息

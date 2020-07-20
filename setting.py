@@ -37,7 +37,7 @@ headers = {'host': easy_domain, 'org': easyops_org, 'user': easy_user, 'content-
 # }
 
 # 搜索所有实例数据的ID
-ConfigSWITCHMODEL = '_SWITCH'
+ConfigSWITCHMODEL = '_FIREWALL'
 
 # 在实例里面的团体字属性名称，ip地址属性的名称，有些人的ip叫IP属性，有些人ip叫name属性
 community = 'community'
@@ -58,16 +58,16 @@ ConfigParams = {
 # 模型配置,请先到cmdb中配置好
 setting_model = {
     # 交换机模型基本属性
-    "model_id": "_SWITCH",  # 模型ID
+    "model_id": "_FIREWALL",  # 模型ID
     "to_port_id": "port_list",  # 交换机 --> 网络设备端口 别名ID
     "fields": {
-        "upTime": "启动时间",
+        "upTime": "启动时间", # uptime
         "brand": "品牌",
         "netMask": "网关地址",
-        "sysDescr": "设备描述",
+        "sysDescr": "设备描述", # sys_descr
         "sysVersion": "固件版本",
-        "sysName": "设备名",
-        "sysModel": "型号",
+        "sysName": "设备名", # sys_name
+        "sysModel": "型号", # sys_model
         "sn": "序列号",
     },
 

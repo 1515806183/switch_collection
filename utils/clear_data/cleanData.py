@@ -50,7 +50,8 @@ class cleanPublicData(object):
 
     # 整合公共oid数据
     def cleandata(self, data):
-        self.res.append(CleanPublicData().run(data))
+        res = CleanPublicData(data).run()
+        self.res.append(res)
 
 
 # 思科数据合并处理

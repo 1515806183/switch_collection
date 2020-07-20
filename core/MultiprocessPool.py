@@ -65,11 +65,11 @@ class CollectionProcess(object):
         # 1. 根据vlan 线程执行二次处理mac_port_table
         deal_vlan(self.datas).run()  # == self.datas
 
-        # 2. 公共oid采集的数据整合(前后print self.datas， 发现后面数据都整理好了，原因应该是多进程共享数据)，保险起见，我们还是将self。data重新赋值
+        # 2. 公共oid采集的数据整合(前后print self.datas， 发现后面数据都整理好了，原因应该是多进程共享数据)，保险起见，我们还是将self.data重新赋值
         cleanPublicData(self.datas).run()  # == self.datas
 
         # 处理设备是思科的，只处理基本信息
-        self._deal_cisco()   # == self.datas
+        # self._deal_cisco()   # == self.datas
 
         # 4. 开启线程处理任务(汇报数据)
         insertData(self.datas).run()

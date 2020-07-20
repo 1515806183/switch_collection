@@ -129,8 +129,7 @@ class insertData(object):
                     print '%s 实例ID：%s 基本信息入库失败' % (str(data_info.get('ip_info')['ip']), str(data_info.get('instanceId')))
 
             else:
-                if data_info.get('ip', ''):
-                    print '%s 实例ID：%s 基本信息入库失败' % (str(data_info.get('ip_info')['ip']), str(data_info.get('instanceId')))
+                print '%s 实例ID：%s 基本信息入库失败' % (str(data_info.get('ip_info')['ip']), str(data_info.get('instanceId')))
 
         except Exception as e:
             print '汇报数据出错:' + str(e)

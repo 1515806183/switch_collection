@@ -33,24 +33,17 @@ class deal_vlan(object):
         # 执行线程
         for i in results:
             i.wait()  # 等待线程函数执行完毕
-
-        # 合并mac_port_table
-        if type(self.datas) == list:
-            self.datas[0]['mac_port_table'] = self.mac_port_table
-        else:
-            self.datas['mac_port_table'] = self.mac_port_table
-
+            
         return self.datas
 
     # 执行命令
     def deal_snmp(self, data_info):
+        mac_port_table = {}
         try:
             if type(data_info) == list:
                 data_info = data_info[0]
             else:
                 data_info = data_info
-
-            mac_port_table = {}
 
             # 1. 根据不同vlan采集信息相关信息是valn_info 和mac_port_result
             valn_info = data_info.get('vlan', '')
@@ -79,7 +72,8 @@ class deal_vlan(object):
                 # 处理完成，删除多余的数据
                 del data_info['vlan']
 
-            self.mac_port_table = mac_port_table
-
         except Exception as e:
             print '处理deal_vlan 函数:' + str(e)
+
+        finally:
+            data_info['mac_port_table'] = mac_port_table

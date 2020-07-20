@@ -54,43 +54,6 @@ def search_datas():
     obj = EasyopsPubic()
     examplelist = obj.search_auto_collect_switch()  # 搜索到所有的实例列表
 
-    # examplelist = [{
-    #     'name': '192.166.255.16',
-    #     'instanceId': '5a50be0cc4d23',
-    #     'ip': '192.166.255.16',
-    #     'community': 'sxtsoft',
-    #     '_object_id': '_SWITCH',
-    #     'sys_name': 'GBZX-SW-ACCESS-C2960X-006'
-    # }, {
-    #     'name': '192.166.255.15',
-    #     'instanceId': '5a8a596c1831d',
-    #     'ip': '192.166.255.15',
-    #     'community': 'sxtsoft',
-    #     '_object_id': '_SWITCH',
-    #     'sys_name': 'GBZX-SW-ACCESS-C2960X-005'
-    # }]
-
-    # examplelist = [{
-    #     'name': '192.168.10.253',
-    #     'instanceId': '5a50be0cc4911',
-    #     'ip': '192.168.10.253',
-    #     'community': 'public',
-    #     '_object_id': '_SWITCH',
-    #     'sys_name': 'GBZX-SW-ACCESS-C2960X-005'
-    # }
-    # ]
-
-    # examplelist = [
-    #     {
-    #     'name': '192.166.255.16',
-    #     'instanceId': '5a50be0cc4d23',
-    #     'ip': '192.166.255.16',
-    #     'community': 'sxtsoft',
-    #     '_object_id': '_SWITCH',
-    #     'sys_name': 'GBZX-SW-ACCESS-C2960X-006'
-    # }
-    # ]
-
     if len(examplelist) == 0:
         exit('没有可用的实例')
 
